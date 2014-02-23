@@ -1,4 +1,4 @@
-var factory = function() {
+var factory = function(d3) {
 
     // Dimensions.
     var DIMENSIONS = getWindowDimensions();
@@ -35,7 +35,11 @@ var factory = function() {
     var zoomed = false;
 
     // Visualize when called.
-    var lapChart = function(el, data) {
+    //
+    // el: the element where the chart will be drawn.
+    // data: the object containing lap data.
+    //
+    var lapChart = function(elId, data) {
 
         // Check integrity.
         integrityCheck(data);
@@ -54,7 +58,7 @@ var factory = function() {
         data.accident = processLapMarkers(data, "accident");
 
         // Visualize the data.
-        visualize(data);
+        visualize(elId, data);
     };
 
     // Check data.
@@ -91,18 +95,18 @@ var factory = function() {
             var name = laps[j].name;
             if (name == undefined || name.length == 0) {
 
-                alert("Warning: invalid name for element " + j);
+                console.log("Warning: invalid name for element " + j);
             }
 
             // Has placings?
             var places = laps[j].placing;
             if (places == undefined) {
 
-                alert("Warning: missing placings for element " + j + " (" + name + ")");
+                console.log("Warning: missing placings for element " + j + " (" + name + ")");
             }
             else if (places.length == 0 || places.length > lapCount + 1) {
 
-                alert("Warning: invalid number of placings (" + places.length + ") for element " + j +
+                console.log("Warning: invalid number of placings (" + places.length + ") for element " + j +
                     " (" + name + ") - expected between 1 and " + (lapCount - 1));
             }
 
@@ -129,7 +133,7 @@ var factory = function() {
                     var placing = places[i];
                     if (isNaN(placing) || placing < 1 || placing % 1 != 0) {
 
-                        alert("Warning: invalid placing '" + placing + "' for " + laps[j].name)
+                        console.log("Warning: invalid placing '" + placing + "' for " + laps[j].name)
                     }
                     else {
 
@@ -147,7 +151,7 @@ var factory = function() {
                 count = positions[j];
                 if (count != 1) {
 
-                    alert("Warning: data inconsistent: lap " + i + ", position " + j + ", count " + count);
+                    console.log("Warning: data inconsistent: lap " + i + ", position " + j + ", count " + count);
                 }
             }
         }
@@ -173,7 +177,7 @@ var factory = function() {
                 var stop = marker[i];
                 if (isNaN(stop) || stop < 0 || stop >= max || stop % 1 != 0) {
 
-                    alert("Warning: invalid " + type + " (" + stop + ") for element " + index + " (" + name + ")");
+                    console.log("Warning: invalid " + type + " (" + stop + ") for element " + index + " (" + name + ")");
                 }
             }
         }
@@ -192,7 +196,7 @@ var factory = function() {
             var lappedLength = lapped.length;
             if (lappedLength != lapCount) {
 
-                alert("Lapped array length (" + lappedLength + ") incorrect - expected length " + lapCount);
+                console.log("Lapped array length (" + lappedLength + ") incorrect - expected length " + lapCount);
             }
 
             for (var j = 1;
@@ -203,7 +207,7 @@ var factory = function() {
                 var position = lapped[j];
                 if (isNaN(position) || position % 1 != 0 || position < -1 || position > driverCount) {
 
-                    alert("Invalid lapped position: element " + j + " (" + position
+                    console.log("Invalid lapped position: element " + j + " (" + position
                         + "); expected integer between -1 and " + driverCount);
                 }
             }
@@ -227,7 +231,7 @@ var factory = function() {
                 var lap = safety[i];
                 if (isNaN(lap) || lap < 0 || lap % 1 != 0 || lap > lapCount) {
 
-                    alert("Invalid safety car lap: element " + i + " (" + lap
+                    console.log("Invalid safety car lap: element " + i + " (" + lap
                         + "); expected integer between 0 and " + lapCount);
                 }
             }
@@ -272,12 +276,12 @@ var factory = function() {
     //
     // data the lap data object.
     //
-    function visualize(data) {
+    function visualize(elId, data) {
 
         // Configure scales.
         configureScales(data);
 
-        var vis = d3.select('#chart')
+        var vis = d3.select(elId)
             .append('svg:svg')
             .attr('width', WIDTH)
             .attr('height', HEIGHT)
@@ -849,7 +853,7 @@ var factory = function() {
 }
 
 if(typeof define === 'function' && define.amd) {
-    define(['d3.js'], factory)
+    define(['d3'], factory)
 } else {
     Relate = factory()
 }
